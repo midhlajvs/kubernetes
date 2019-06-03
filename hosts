@@ -1,11 +1,11 @@
 [all]
-k8master ansible_host=23.237.48.173 hostname=k8master  
-k8worker1 ansible_host=23.237.48.171 hostname=k8worker1
-k8worker2 ansible_host=23.237.48.3 hostname=k8worker2
+k8master ansible_host=1.2.3.1 hostname=k8master  
+k8worker1 ansible_host=1.2.3.2 hostname=k8worker1
+k8worker2 ansible_host=1.2.3.3  hostname=k8worker2
 
 [master]
-k8master ansible_host=23.237.48.173
+k8master ansible_host=1.2.3.1
 
 [worker]
-k8worker1 ansible_host=23.237.48.171
-k8worker2 ansible_host=23.237.48.3
+k8worker1 ansible_host=1.2.3.2 
+k8worker2 ansible_host=1.2.3.3
