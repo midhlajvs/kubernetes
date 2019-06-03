@@ -1,0 +1,19 @@
+---
+
+- name: K8 Cluster Initialization
+  hosts: all 
+  user: root 
+  roles: 
+    - preflight
+
+- name: K8 Master Configuration
+  hosts: master
+  user: root
+  roles:
+    - k8master
+
+- name: K8 Worker Configuration
+  hosts: worker
+  user: root
+  roles:
+    - k8worker

@@ -1,0 +1,68 @@
+---
+
+- name: Set hostname for the Nodes
+  hostname: 
+    name: "{{ hostname }}"
+    
+- name: Add hosts entry to all Nodes
+  lineinfile: 
+    dest: /etc/hosts
+    regexp: '.*{{ item }}$'
+    line: "{{ hostvars[item].ansible_host }} {{item}}"
+    state: present
+  when: hostvars[item].ansible_host is defined
+  with_items: "{{ groups.all }}"
+
+- name: Add nameserver entry to the resolv.conf
+  lineinfile: 
+    dest: /etc/resolv.conf
+    line: "nameserver 8.8.8.8"
+    state: present
+
+- name: Turn Off Swap 
+  command: swapoff -a 
+
+- name: Remove swap entry from fstab 
+  lineinfile: 
+    dest: /etc/fstab
+    regexp: 'swap'
+    state: absent
+
+- name: Disable password authentication 
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '#PasswordAuthentication yes'
+    line: 'PasswordAuthentication no'
+    state: present
+  notify:
+    - Restart SSH
+
+- name: Add Docker Repository
+  copy:
+    src: docker-ce.repo 
+    dest: /etc/yum.repos.d/docker-ce.repo
+    owner: root 
+    group: root
+    mode: 0644
+
+- name: Add Kubernetes repository
+  copy: 
+    src: kubernetes.repo 
+    dest: /etc/yum.repos.d/kubernetes.repo
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install Docker and Kubernetes Packages
+  yum: 
+    name:
+      - docker-ce 
+      - docker-ce-cli
+      - containerd.io
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+  notify:
+    - Start Docker
+    - Start Kubelet

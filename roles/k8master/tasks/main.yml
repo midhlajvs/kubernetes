@@ -1,0 +1,32 @@
+---
+# tasks file for k8
+
+- name: Initialize the Kubernetes Master
+  command: 
+    argv:    
+      - kubeadm 
+      - init 
+      - --pod-network-cidr=10.244.0.0/16
+  register: k8init
+- debug: var=k8init.stdout_lines
+
+- name: Copy Kubernetes Master Configuration
+  shell: "{{ item }}"
+  with_items:
+    - "mkdir -p $HOME/.kube"
+    - "cp -i /etc/kubernetes/admin.conf $HOME/.kube/config"
+    - "chown $(id -u):$(id -g) $HOME/.kube/config"
+
+- name: Configure IPtables
+  command: sysctl net.bridge.bridge-nf-call-iptables=1
+
+- name: Apply Flannel CNI 
+  command: "{{ item }}"
+  with_items:
+    - "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
+    - "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml"
+
+- name: Get join token 
+  command: kubeadm token create --print-join-command
+  register: join_token
+

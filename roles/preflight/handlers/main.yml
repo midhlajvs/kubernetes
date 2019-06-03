@@ -1,0 +1,19 @@
+---
+# handlers file for preflight
+- name: Restart SSH
+  systemd:
+    name: sshd 
+    state: restarted
+    enabled: yes
+
+- name: Start Docker
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Start Kubelet
+  systemd:
+    name: kubelet
+    state: started
+    enabled: yes

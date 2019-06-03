@@ -1,0 +1,5 @@
+---
+# tasks file for k8worker
+- name: Join Kubernetes Master
+  command: "{{ hostvars['k8master']['join_token']['stdout'] }}"
+
